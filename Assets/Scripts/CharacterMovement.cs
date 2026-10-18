@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 
 public class CharacterMovement : MonoBehaviour
 {
@@ -30,6 +31,8 @@ public class CharacterMovement : MonoBehaviour
 
 
     private CharacterAnimator characterAnimator;
+
+    private Coroutine doubleJumpTimer;
 
     
 
@@ -119,5 +122,22 @@ public class CharacterMovement : MonoBehaviour
          doubleJumpUsed = true;
 
         characterAnimator.PlayDoubleJumpAnimation();
+    }
+
+    public void ActivateDoubleJump()
+    {
+        if (doubleJumpTimer != null)
+        {
+            StopCoroutine(doubleJumpTimer);
+        }
+        doubleJumpTimer = StartCoroutine(DoubleJumpCountdown());
+    }
+
+    private IEnumerator DoubleJumpCountdown()
+    {
+        doubleJumpActive = true;
+        yield return new WaitForSeconds(30f);
+        doubleJumpActive = false;
+        doubleJumpTimer = null;
     }
 }
