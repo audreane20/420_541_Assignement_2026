@@ -107,8 +107,6 @@ public class CharacterMovement : MonoBehaviour
 
     void FixedUpdate()
     {
-        Vector3 movement = new Vector3(horizontalInput * leftRight, 0, verticalInput * frontBack) * Time.fixedDeltaTime;
-        rb.MovePosition(rb.position + movement);
 
         Vector3 forward = cameraTransform.forward;
         Vector3 right = cameraTransform.right;
@@ -122,8 +120,15 @@ public class CharacterMovement : MonoBehaviour
         Vector3 direction = forward * verticalInput + right * horizontalInput;
 
         direction = Vector3.ClampMagnitude(direction, 1f);
-            
+
         rb.MovePosition(rb.position + direction * leftRight * Time.fixedDeltaTime);
+
+        if (direction.sqrMagnitude > 0.01f)
+        {
+            Quaternion targetRotation = Quaternion.LookRotation(direction);
+
+            rb.MoveRotation(Quaternion.Slerp(rb.rotation, targetRotation, 10f * Time.fixedDeltaTime));
+        }
     }
 
     void Jump()
