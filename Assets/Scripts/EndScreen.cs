@@ -8,8 +8,16 @@ public class EndScreen : MonoBehaviour
 
     private void Start()
     {
-        // No ScoreManager object exists in this scene, but we can
-        // still read the static FinalScore through the class name
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+
         finalScoreText.text = "Final Score: " + GameManager.Instance.score;
+
+
+    }
+
+    public void RestartGame()
+    {
+        GameManager.Instance.StartGame();
     }
 }
