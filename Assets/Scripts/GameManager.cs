@@ -61,6 +61,7 @@ public class GameManager : MonoBehaviour
         score = levelStartScore;
         health = 3;
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        ClearScoreBoost();
     }
 
     public void LoadNextLevel()
@@ -75,6 +76,7 @@ public class GameManager : MonoBehaviour
         health = 3;
         levelStartScore = 0;
         SceneManager.LoadScene("Level1");
+        ClearScoreBoost();
     }
 
     public void QuitGame()
@@ -98,6 +100,18 @@ public class GameManager : MonoBehaviour
         yield return new WaitForSeconds(10f);
         ScoreMultiplier = 1;
         scoreBoostTimer = null;
+    }
+
+
+    private void ClearScoreBoost()
+    {
+        if(scoreBoostTimer != null)
+        {
+            StopCoroutine(scoreBoostTimer);
+            scoreBoostTimer = null;
+        }
+
+        ScoreMultiplier = 1;
     }
 
 }
