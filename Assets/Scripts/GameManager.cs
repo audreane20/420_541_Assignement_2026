@@ -1,8 +1,13 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using System.Collections;
 
 public class GameManager : MonoBehaviour
 {
+
+    private Coroutine scoreBoostTimer;
+
+    public int ScoreMultiplier { get; private set; } = 1;
     public int score = 0;
     public int health = 3;
     public int levelStartScore = 0;
@@ -76,6 +81,23 @@ public class GameManager : MonoBehaviour
     {
         Debug.Log("Quitting game...");
         Application.Quit();
+    }
+
+    public void ActivateScoreBoost()
+    {
+        if (scoreBoostTimer != null)
+        {
+            StopCoroutine(scoreBoostTimer);
+        }
+        scoreBoostTimer = StartCoroutine(ScoreBoostCountdown());
+    }
+
+    private IEnumerator ScoreBoostCountdown()
+    {
+        ScoreMultiplier = 2;
+        yield return new WaitForSeconds(10f);
+        ScoreMultiplier = 1;
+        scoreBoostTimer = null;
     }
 
 }

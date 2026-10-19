@@ -29,10 +29,17 @@ public class CharacterMovement : MonoBehaviour
 
     public float doubleJumpForce = 8f;
 
+    public Transform cameraTransform;
+
 
     private CharacterAnimator characterAnimator;
 
     private Coroutine doubleJumpTimer;
+
+
+    private float speedMultiplier = 1f;
+
+    private Coroutine speedBoostTimer;
 
     
 
@@ -51,18 +58,16 @@ public class CharacterMovement : MonoBehaviour
         horizontalInput = Input.GetAxis("Horizontal");
         verticalInput = Input.GetAxis("Vertical");
 
-        if(Input.GetKey(KeyCode.LeftShift))
+        isRunning = Input.GetKey(KeyCode.LeftShift);
+        float currentSpeed = walkSpeed * speedMultiplier;
+
+        if (isRunning)
         {
-            isRunning = true;
-            leftRight = walkSpeed * 2f;
-            frontBack = walkSpeed * 2f;
+            currentSpeed *= 2f;
         }
-        else
-        {
-            isRunning = false;
-            leftRight = walkSpeed;
-            frontBack = walkSpeed;
-        }
+
+        leftRight = currentSpeed;
+        frontBack = currentSpeed; 
 
         isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundLayer);
 
@@ -104,6 +109,21 @@ public class CharacterMovement : MonoBehaviour
     {
         Vector3 movement = new Vector3(horizontalInput * leftRight, 0, verticalInput * frontBack) * Time.fixedDeltaTime;
         rb.MovePosition(rb.position + movement);
+
+        Vector3 forward = cameraTransform.forward;
+        Vector3 right = cameraTransform.right;
+
+        forward.y = 0f;
+        right.y = 0f;
+
+        forward.Normalize();
+        right.Normalize();
+
+        Vector3 direction = forward * verticalInput + right * horizontalInput;
+
+        direction = Vector3.ClampMagnitude(direction, 1f);
+            
+        rb.MovePosition(rb.position + direction * leftRight * Time.fixedDeltaTime);
     }
 
     void Jump()
@@ -139,5 +159,24 @@ public class CharacterMovement : MonoBehaviour
         yield return new WaitForSeconds(30f);
         doubleJumpActive = false;
         doubleJumpTimer = null;
+    }
+
+    public void ActivateSpeedBoost()
+    {
+        if(speedBoostTimer != null)
+        {
+            StopCoroutine(speedBoostTimer);
+
+        }
+
+        speedBoostTimer = StartCoroutine(SpeedBoostCountdown());
+    }
+
+    private IEnumerator SpeedBoostCountdown()
+    {
+        speedMultiplier = 2f;
+        yield return new WaitForSeconds(5f);
+        speedMultiplier = 1f;
+        speedBoostTimer = null;
     }
 }
